@@ -8,12 +8,12 @@ int isDown(Ship ship) {
 }
 Ship *ShipC(char name[20], int size, char notHit, char hit) {
     Ship *ship;
-    ship = (Ship*) malloc(sizeof(Ship*));
+    ship = (Ship*) malloc(sizeof(Ship));
     copyString(ship->name, name);
     ship->size = size;
     ship->notHit = notHit;
     ship->hit = hit;
-    ship->position = (struct Position*) malloc(sizeof(struct Position) * size);
+    ship->position = (Position*) malloc(sizeof(Position) * size);
     for(int i = 0; i < size; i++) ship->position[i].down = 0;
     return ship;
 }

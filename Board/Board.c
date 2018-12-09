@@ -19,9 +19,11 @@ int isItAShip(Board *player, int x, int y, int mustHit ) {
 }
 
 void initBoard(Board *board) {
+  board->nbShip = 0;
     for(int i = 0; i < SIZE; i++) {
         for(int j = 0; j < SIZE; j++) {
             board->pos[i][j] = ' ';
+            board->opponent[i][j] = 0;
         }
     }
 }
@@ -36,6 +38,23 @@ void showBoard(Board *board) {
             char c;
             if(board->pos[j][i] == ' ') c = ' ';
             else if(board->pos[j][i] == 'C') c = 'S';
+            else c = 'X';
+            printf("%3c |", board->pos[j][i]);
+        }
+        printf("\n");
+    }
+}
+
+void showBoardOpponent(Board *board) {
+    printf("\n     ");
+    for(int i = 0; i < SIZE; i++) printf("%3c |", (char)('A' + i));
+    printf("\n");
+    for(int i = 0; i < SIZE; i++) {
+            printf("%3d |", (i+1));
+        for(int j = 0; j < SIZE; j++) {
+            char c;
+            if(board->pos[j][i] ==  0) c = '?';
+            else if(board->pos[j][i] == '1') c = ' ';
             else c = 'X';
             printf("%3c |", board->pos[j][i]);
         }
