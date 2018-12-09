@@ -1,0 +1,3 @@
+C:\Users\Baptiste\AppData\Local\Temp\cccEYSwh.o:Ship.c:(.text+0x73): undefined reference to `copyString'
+C:\Users\Baptiste\AppData\Local\Temp\ccLOkPPf.o:main.c:(.text+0x1b): undefined reference to `fct1'
+collect2.exe: error: ld returned 1 exit status
