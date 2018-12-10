@@ -8,13 +8,16 @@
 void play() {
   Board *j1 = initPlayer();
   Board *j2 = initPlayer();
+  int i = 0;
+  setBoardIA(j1);
+  setBoardIA(j2);
   int continuer = 0;
   int tour = 0;
 
   while (continuer == 0) {
     if(tour == 0) {
       playJ(j1, j2);
-      if(isLose(j1)) continuer = 1;
+      if(isLose(j2)) continuer = 1;
     } else {
       playJ(j2, j1);
       if(isLose(j1)) continuer = 2;

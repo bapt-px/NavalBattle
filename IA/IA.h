@@ -8,5 +8,8 @@
 
 
   void selectAPlace(int *x, int *y, int *sense, Ship *ship, Board *board);
+  void setBoardIA(Board *board);
+  void setIAPlay(Board *board, int x, int y, int result);
+  void getIAPlay(Board *board, int *x, int *y);
 
 #endif

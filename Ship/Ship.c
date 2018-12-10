@@ -2,7 +2,7 @@
 
 int isDown(Ship ship) {
     for(int i = 0; i < ship.size; i++) {
-      if(ship.position[i].down == 0) return 0;
+      if(ship.position[i].down == 0){ printf("down %d : %d\n", i, ship.position[i].down); return 0; }
     }
     return 1;
 }

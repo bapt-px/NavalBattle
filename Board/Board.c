@@ -6,6 +6,8 @@ int isItAShip(Board *player, int x, int y, int mustHit ) {
     else if (mustHit) {
         for(int i = 0; i < NBSHIP; i++) {
             for(int j = 0; j < player->ship[i].size; j++) {
+              printf("posA %d, %d\nposB %d, %d\n", x, y, player->ship[i].position[j].x, player->ship[i].position[j].y );
+
                 if (player->ship[i].position[j].x == x && player->ship[i].position[j].y == y) {
                     player->ship[i].position[j].down = 1;
                     if (isDown(player->ship[i])) return 2;
@@ -47,16 +49,28 @@ void showBoard(Board *board) {
 
 void showBoardOpponent(Board *board) {
     printf("\n     ");
-    for(int i = 0; i < SIZE; i++) printf("%3c |", (char)('A' + i));
+    for(int i = 0; i < SIZE; i++) printf("%6c |", (char)('A' + i));
     printf("\n");
     for(int i = 0; i < SIZE; i++) {
             printf("%3d |", (i+1));
         for(int j = 0; j < SIZE; j++) {
             char c;
-            if(board->pos[j][i] ==  0) c = '?';
-            else if(board->pos[j][i] == '1') c = ' ';
+            if(board->opponent[j][i] ==  0) c = '?';
+            else if(board->opponent[j][i] == 1) c = ' ';
             else c = 'X';
-            printf("%3c |", board->pos[j][i]);
+            printf("%3c%3d |", c, j);
+        }
+        printf("\n");
+    }
+}
+void showBoardIA(Board *board) {
+    printf("\n     ");
+    for(int i = 0; i < SIZE; i++) printf("%3c |", (char)('A' + i));
+    printf("\n");
+    for(int i = 0; i < SIZE; i++) {
+            printf("%3d |", (i+1));
+        for(int j = 0; j < SIZE; j++) {
+            printf("%4d |", board->IAWeight[j][i]);
         }
         printf("\n");
     }

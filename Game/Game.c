@@ -66,7 +66,7 @@ void placeShip(Board *board, Ship *ship, int isAuto) {
     if (sense == 0) {
         for(int i = 0; i < ship->size; i++) {
             board->pos[x + i][y] = ship->notHit;
-            ship->position[i].x = x;
+            ship->position[i].x = x + i;
             ship->position[i].y = y;
         }
     }
@@ -74,7 +74,7 @@ void placeShip(Board *board, Ship *ship, int isAuto) {
         for(int i = 0; i < ship->size; i++) {
             board->pos[x][y + i] = ship->notHit;
             ship->position[i].x = x;
-            ship->position[i].y = y;
+            ship->position[i].y =  + i;
         }
     }
     int nb = board->nbShip;
@@ -89,16 +89,17 @@ Board *initPlayer() {
     player = (Board*) malloc(sizeof(Board));
 
     printf("Entrez votre pseudo : ");
-    // do { fgets(player->name, 32, stdin); } while (player->name[0] == 10);
+    do { fgets(player->name, 32, stdin); } while (player->name[0] == 10);
+    int j = 0;
+    while (player->name[j] != '\0') if (player->name[j++] == '\n') player->name[j - 1] = '\0';
     initBoard(player);
 
     player->ship = (Ship*) malloc(sizeof(Ship) * NBSHIP);
 
     for(int i = 0; i < NBCARRIER; i++) placeShip(player, ShipC("Carrier", 5, 'c', 'C'), autoPlace);
-    for(int i = 0; i < NBBATTLESHIPS; i++) placeShip(player, ShipC("Battleships", 4, 'b', 'B'), autoPlace);
-    for(int i = 0; i < NBSUBMARINES; i++) placeShip(player, ShipC("Submarines", 3, 's', 'S'), autoPlace);
-    for(int i = 0; i < NBDESTROYERS; i++) placeShip(player, ShipC("Destroyers", 2, 'd', 'D'), autoPlace);
-    //printf("111 : %d\n", player->ship[0].position[0].down);
+    // for(int i = 0; i < NBBATTLESHIPS; i++) placeShip(player, ShipC("Battleships", 4, 'b', 'B'), autoPlace);
+    // for(int i = 0; i < NBSUBMARINES; i++) placeShip(player, ShipC("Submarines", 3, 's', 'S'), autoPlace);
+    // for(int i = 0; i < NBDESTROYERS; i++) placeShip(player, ShipC("Destroyers", 2, 'd', 'D'), autoPlace);
     return player;
 }
 
@@ -116,23 +117,38 @@ int isLose(Board *board) {
 int playJ(Board *j, Board *adversary) {
   int continuer = 1, x, y;
   char saisi[4];
+  int result;
   while (continuer) {
-    printf("%s, Select a case to shoot (ex: B4) : ", j->name );
+    showBoard(j);
+    showBoardIA(j);
+    showBoardOpponent(j);
+    printf("%s, Select a case to shoot (ex: B4) IA for auto-play : ", j->name );
     do { fgets(saisi, 4, stdin); } while (saisi[0] == 10);
-    if (saisi[0] >= 'A') saisi[0] -= 32;
-    x = saisi[0] - 'A';
-    if (saisi[2] != '\0') y = 10;
-    else y = saisi[1] - '0';
+
+    if((saisi[0] == 'i' || saisi[0] == 'I') && (saisi[1] == 'a' || saisi[1] == 'A')) getIAPlay(j, &x, &y);
+    else {
+      if (saisi[0] >= 'A') saisi[0] -= 32;
+      x = saisi[0] - 'A';
+      if (saisi[1] == '1' && saisi[2] == '2') y = 10;
+      else y = saisi[1] - '1';
+      printf("Saisi : %d / %d\n", x, y );
+
+    }
     if(x < 0 || x > SIZE || y < 0 || y > SIZE) {
-      printf("Saisi incorrecte !\n" );
+      printf("Saisi incorrecte ! : %d / %d\n", x, y );
     } else if (j->opponent[x][y] != 0) {
       printf("Vous avez déjà tirer sur cette case !\n");
     } else {
-      int result = isItAShip(adversary, x, y, 1);
+
+      result = isItAShip(adversary, x, y, 1);
       if(result == 1) printf("Touche !\n" );
       else if(result == 2) printf("Touche coule !\n" );
       else printf("Flop ...\n" );
+      printf("X : %d\n", x );
+      j->opponent[x][y] = (result == 0 ? 1 : 2);
       continuer = 0;
     }
   }
+  setIAPlay(j, x, y, result);
+
 }

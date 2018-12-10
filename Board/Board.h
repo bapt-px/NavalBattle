@@ -16,6 +16,7 @@
   struct Board {
     char pos[SIZE][SIZE];
     int opponent[SIZE][SIZE];
+    int IAWeight[SIZE][SIZE];
     char name[32];
     Ship *ship;
     int nbShip;
@@ -25,5 +26,6 @@
   int isItAShip(Board *player, int x, int y, int mustHit );
   void showBoard(Board *board);
   void showBoardOpponent(Board *board);
+  void showBoardIA(Board *board);
 
 #endif
