@@ -19,7 +19,7 @@ int main() {
 
 	bind(filedesc, (struct sockaddr *)&servsocket, sizeof(servsocket));
 	listen(filedesc,5);
-	printf("connected?");
+	printf("connected");
 
 	while(conn = accept(filedesc, (struct sockaddr *) NULL, NULL)) {
 		int pid;

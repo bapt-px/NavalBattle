@@ -21,11 +21,12 @@
     Ship *ship;
     int nbShip;
   };
-  Board *initPlayer();
+  Board *initPlayer(int isIA);
 
   int isItAShip(Board *player, int x, int y, int mustHit );
   void showBoard(Board *board);
   void showBoardOpponent(Board *board);
   void showBoardIA(Board *board);
+  void showLBoard(Board *board);
 
 #endif
