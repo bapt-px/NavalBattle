@@ -5,7 +5,7 @@
   #include <stdlib.h>
   #include "../Ship/Ship.h"
   #define SIZE 10
-  #define NBSHIP 1
+  #define NBSHIP 10
   #define NBCARRIER 1
   #define NBBATTLESHIPS 2
   #define NBSUBMARINES 3
