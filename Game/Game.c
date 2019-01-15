@@ -160,11 +160,14 @@ int playJ(Board *j, Board *adversary, int isIA, int isOnline) {
       if (!isOnline) result = isItAShip(adversary, x, y, 1);
       else {
         char tab[3] = {x, y, '\0'};
-        send(conn, tab, strlen(tab), 0);
+        int n;
+        do {
+          printf("Send : %d\n", n);
+        } while((n = send(conn, tab, strlen(tab), 0)) < 0);
         printf("test playJ 1 %d / %d\n", tab[0], tab[1] );
 
         char resultC[2];
-        recv(conn, resultC, 100, 0) ;
+        printf("retour : %d\n", recv(conn, resultC, 100, 0));
         printf("test playJ 2 %d \n", resultC[0]);
 
         result = resultC[0];
@@ -185,8 +188,7 @@ int playJ(Board *j, Board *adversary, int isIA, int isOnline) {
 
 void *waitOpponentR() {
   char t[2];
-  // recv(conn, t, 2, 0);
-  for(int i = 0; i < 10; i++) printf("wait %d : %d / %c\n", i, t[i], t[i]);
+  printf("Retour : %d\n", recv(conn, t, 2, 0));
 
   opponentReady = 1;
 }
@@ -215,8 +217,10 @@ void hostParty () {
   Board *j1 = initPlayer(0);
 
   char c[2] = { 'o', '\0' };
-
-  send(conn, c, strlen(c), 0);
+  int n;
+  do {
+    printf("Send : %d\n", n);
+  } while( (n = send(conn, c, strlen(c), 0)) < 0);
   if(!opponentReady) printf("attente de l'adversaire\n" );
 
   pthread_join(thread_id, NULL);
@@ -227,12 +231,14 @@ void hostParty () {
       printf("debut\n");
       playJ(j1, NULL, 0, 1);
       char tab[3];
-      recv(conn, tab, 3, 0);
+      printf("Retour : %d\n", recv(conn, tab, 3, 0));
       for(int i = -1; i < 5; i++) printf("%d : %d / %c\n", i, tab[i], tab[i]);
       printf("TEST RECEIve %d / %d\n", tab[0], tab[1]);
       sleep(1);
       char result[2] = { isItAShip(j1, tab[0], tab[1], 1), '\0' };
-      send(conn, result, strlen(result), 0);
+      do {
+        printf("Send : %d\n", n );
+      } while ((n = send(conn, result, strlen(result), 0)) < 0);
       printf("TEST send");
 
       if(isLose(j1)) continuer = 1;
@@ -248,8 +254,13 @@ void joinParty() {
   int filedesc, continuer = 0;
   char message[100] = "";
 
+  // struct hostent *hostinfo = NULL;
+  // const char *hostname = "127.0.0.1";
+  // hostinfo = gethostbyname(hostname);
+
 
   filedesc = socket(AF_INET, SOCK_STREAM, 0);
+  // servsocket.sin_addr = *(IN_ADDR *) hostinfo->h_addr;
   servsocket.sin_family = AF_INET;
   servsocket.sin_port = htons(8096);
 
@@ -265,7 +276,11 @@ void joinParty() {
   Board *j1 = initPlayer(0);
   char c[2] = { 'o', '\0' };
 
-  send(conn, c, strlen(c), 0);
+  int n;
+
+  do{
+    printf("send : %d\n", n);
+  }  while((n = send(conn, c, strlen(c), 0)) < 0);
 
   if(!opponentReady) printf("attente de l'adversaire  \n" );
 
@@ -277,12 +292,14 @@ void joinParty() {
       char tab[3];
       printf("debut\n" );
 
-      recv(conn, tab, 3, 0);
+      printf("Retour : %d\n", recv(conn, tab, 3, 0));
       printf("%d / %d / %d\n", tab[0], tab[1], tab[2] );
       printf("data Receive : %d, %d\n",  tab[0], tab[1]);
       char result[2] = { isItAShip(j1, tab[0], tab[1], 1), 45 };
       sleep(1);
-      send(conn, result, strlen(result), 0);
+      do {
+        printf("send : %d\n", n );
+      } while((n = send(conn, result, strlen(result), 0)) < 0);
       printf("data send : %d, %d\n",  result[0], result[1]);
 
       playJ(j1, NULL, 0, 1);
