@@ -4,6 +4,7 @@
   #include <stdlib.h>
   #include "../fct/fct.h"
   #include "Position.h"
+  #include <string.h>
 
   typedef struct Position Position;
   struct Position {

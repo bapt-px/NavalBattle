@@ -74,7 +74,7 @@ void placeShip(Board *board, Ship *ship, int isAuto) {
         for(int i = 0; i < ship->size; i++) {
             board->pos[x][y + i] = ship->notHit;
             ship->position[i].x = x;
-            ship->position[i].y =  + i;
+            ship->position[i].y = y + i;
         }
     }
     int nb = board->nbShip;
@@ -110,12 +110,11 @@ Board *initPlayer(int isIA) {
 
 int isLose(Board *board) {
 
-  printf("%s ISLOSE 1\n", board->name );
   for(int i = 0;i < NBSHIP; i++) {
 
     for(int j = 0;j < board->ship[i].size; j++) {
 
-      if(board->ship[i].position[j].down == 0) return 0;
+      if(board->ship[i].position[j].down == 0) {  return 0; }
     }
   }
 
@@ -143,34 +142,30 @@ int playJ(Board *j, Board *adversary, int isIA, int isOnline) {
 
         if (saisi[0] >= 'A') saisi[0] -= 32;
         x = saisi[0] - 'A';
-        if (saisi[1] == '1' && saisi[2] == '2') y = 10;
+        if (saisi[1] == '1' && saisi[2] == '0') y = 10;
         else y = saisi[1] - '1';
-        printf("Saisi : %d / %d\n", x, y );
       }
     }
 
     if(x < 0 || x > SIZE || y < 0 || y > SIZE) {
       printf("Saisi incorrecte ! : %d / %d\n", x, y );
     } else if (j->opponent[x][y] != 0) {
-      printf("%d / %d\n", x, y);
       showBoardIA(j);
       printf("%s avez déjà tirer sur cette case ! %d\n", j->name, saisi[0]);
     } else {
 
       if (!isOnline) result = isItAShip(adversary, x, y, 1);
       else {
-        char tab[3] = {x, y, '\0'};
+        char tab[3] = {48 + x, 48 + y, '\0'};
         int n;
         do {
-          printf("Send : %d\n", n);
-        } while((n = send(conn, tab, strlen(tab), 0)) < 0);
-        printf("test playJ 1 %d / %d\n", tab[0], tab[1] );
+        } while((n = send(conn, tab, strlen(tab), 0)) <= 0);
 
-        char resultC[2];
-        printf("retour : %d\n", recv(conn, resultC, 100, 0));
-        printf("test playJ 2 %d \n", resultC[0]);
-
-        result = resultC[0];
+        char resultC[3];
+        recv(conn, resultC, 3, 0);
+        if(resultC[0] == 'a') result = 0;
+        else if (resultC[0] == 'b') result = 1;
+        else result = 2;
       }
 
       if(!isIA) {
@@ -195,6 +190,7 @@ void *waitOpponentR() {
 
 void hostParty () {
   opponentReady = 0;
+  nbTouch = 0;
   struct sockaddr_in servsocket;
   pthread_t thread_id;
   int filedesc, continuer = 0;
@@ -220,30 +216,29 @@ void hostParty () {
   int n;
   do {
     printf("Send : %d\n", n);
-  } while( (n = send(conn, c, strlen(c), 0)) < 0);
-  if(!opponentReady) printf("attente de l'adversaire\n" );
+  } while((n = send(conn, c, strlen(c), 0)) < 0);
+  if(!opponentReady) printf("attente de l'adversaire n = %d\n", n );
 
   pthread_join(thread_id, NULL);
 
   setBoardIA(j1);
 
   while (continuer == 0) {
-      printf("debut\n");
       playJ(j1, NULL, 0, 1);
       char tab[3];
-      printf("Retour : %d\n", recv(conn, tab, 3, 0));
-      for(int i = -1; i < 5; i++) printf("%d : %d / %c\n", i, tab[i], tab[i]);
-      printf("TEST RECEIve %d / %d\n", tab[0], tab[1]);
-      sleep(1);
-      char result[2] = { isItAShip(j1, tab[0], tab[1], 1), '\0' };
+      recv(conn, tab, 3, 0);
+      tab[0] -= 48;
+      if(tab[1] == '1' && tab[2] == '0' ) tab[1] = 10;
+      else tab[1] -= 48;
+      char result[2] = { isItAShipToChar(isItAShip(j1, tab[0], tab[1], 1)), '\0' };
       do {
-        printf("Send : %d\n", n );
-      } while ((n = send(conn, result, strlen(result), 0)) < 0);
-      printf("TEST send");
+      } while ((n = send(conn, result, strlen(result), 0)) <= 0);
 
       if(isLose(j1)) continuer = 1;
+      if(conn < 0) continuer = 2;
   }
-  exit(0);
+  if( continuer == 1) printf("Vous avez perdu...\n" );
+  else printf("Felicitation ! vous avez gagne !\n" );
 }
 
 void joinParty() {
@@ -282,7 +277,7 @@ void joinParty() {
     printf("send : %d\n", n);
   }  while((n = send(conn, c, strlen(c), 0)) < 0);
 
-  if(!opponentReady) printf("attente de l'adversaire  \n" );
+  if(!opponentReady) printf("attente de l'adversaire  n= %d\n", n );
 
   pthread_join(thread_id, NULL);
 
@@ -290,19 +285,21 @@ void joinParty() {
 
   while (continuer == 0) {
       char tab[3];
-      printf("debut\n" );
 
-      printf("Retour : %d\n", recv(conn, tab, 3, 0));
-      printf("%d / %d / %d\n", tab[0], tab[1], tab[2] );
-      printf("data Receive : %d, %d\n",  tab[0], tab[1]);
-      char result[2] = { isItAShip(j1, tab[0], tab[1], 1), 45 };
-      sleep(1);
+      recv(conn, tab, 3, 0);
+      tab[0] -= 48;
+      if(tab[1] == '1' && tab[2] == '0' ) tab[1] = 10;
+      else tab[1] -= 48;
+      char result[2];
+      result[0] = isItAShipToChar(isItAShip(j1, tab[0], tab[1], 1));
+      result[1] = '\0';
       do {
-        printf("send : %d\n", n );
-      } while((n = send(conn, result, strlen(result), 0)) < 0);
-      printf("data send : %d, %d\n",  result[0], result[1]);
+      } while((n = send(conn, result, strlen(result), 0)) <= 0);
 
       playJ(j1, NULL, 0, 1);
       if(isLose(j1)) continuer = 1;
+      if(conn < 0) continuer = 2;
   }
+  if( continuer == 1) printf("Vous avez perdu...\n" );
+  else printf("Felicitation ! vous avez gagne !\n" );
 }

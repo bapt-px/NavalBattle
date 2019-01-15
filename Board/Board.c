@@ -5,19 +5,13 @@ int isItAShip(Board *player, int x, int y, int mustHit ) {
 
     if(player->pos[x][y] == ' ') { player->pos[x][y] = 'x'; return 0; }
     else if (mustHit) {
-      printf("SHIP 1 \n");
-      printf("SHIP 1.5 : %d \n", player->pos[x][y]);
 
         for(int i = 0; i < NBSHIP; i++) {
             for(int j = 0; j < player->ship[i].size; j++) {
-              printf("SHIP 2 : %d \n", player->ship[i].size);
-
                 if (player->ship[i].position[j].x == x && player->ship[i].position[j].y == y) {
                   printf("Hit !\n" );
                     player->pos[x][y] = player->ship[i].hit;
                     player->ship[i].position[j].down = 1;
-                    printf("SHIP 3 :  \n");
-
                     if (isDown(player->ship[i])) return 2;
                     else return 1;
                     break;
@@ -28,14 +22,20 @@ int isItAShip(Board *player, int x, int y, int mustHit ) {
     return 1;
 }
 
+char isItAShipToChar(int c) {
+  if (c == 0) return 'a';
+  else if(c == 1) return 'b';
+  else return 'c';
+}
+
 void initBoard(Board *board) {
   board->nbShip = 0;
-    for(int i = 0; i < SIZE; i++) {
-        for(int j = 0; j < SIZE; j++) {
-            board->pos[i][j] = ' ';
-            board->opponent[i][j] = 0;
-        }
-    }
+  for(int i = 0; i < SIZE; i++) {
+      for(int j = 0; j < SIZE; j++) {
+          board->pos[i][j] = ' ';
+          board->opponent[i][j] = 0;
+      }
+  }
 }
 
 void showBoard(Board *board) {
