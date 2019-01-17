@@ -9,7 +9,7 @@ void placeShip(Board *board, Ship *ship, int isAuto) {
           char saisi[4];
           printf("Placement d'un %s, sur %d cases (ex : B4V ou C6H) : ", ship->name, ship->size);
           do { fgets(saisi, 4, stdin); } while (saisi[0] == 10);
-          if (saisi[0] >= 'A') saisi[0] -= 32;
+          if (saisi[0] >= 'A') saisi[0] += 32;
           x = saisi[0] - 'A';
           if (saisi[0] >= 'A' && saisi[0] <= 'J') {
               y = -1;
