@@ -7,10 +7,10 @@ void placeShip(Board *board, Ship *ship, int isAuto) {
     if(!isAuto) {
       do {
           char saisi[4];
-          printf("Placement d'un %s, sur %d cases (ex : B4V ou C6H) : ", ship->name, ship->size);
+          printf("Placement d'un %s, sur %d cases (ex : c4v ou c6h) : ", ship->name, ship->size);
           do { fgets(saisi, 4, stdin); } while (saisi[0] == 10);
-          if (saisi[0] >= 'A') saisi[0] += 32;
-          x = saisi[0] - 'A';
+          if (saisi[0] >= 'A' && saisi[0] <= 'J') saisi[0] += 32;
+          x = saisi[0] - 'a';
           if (saisi[0] >= 'A' && saisi[0] <= 'J') {
               y = -1;
               if(saisi[1] == '1' && saisi[2] == 0) y = 10;
@@ -134,14 +134,14 @@ int playJ(Board *j, Board *adversary, int isIA, int isOnline) {
     if(isIA)  getIAPlay(j, &x, &y);
     else {
 
-      printf("%s, Select a case to shoot (ex: B4) IA for auto-play : ", j->name );
+      printf("%s, Select a case to shoot (ex: b4) IA for auto-play : ", j->name );
       do { fgets(saisi, 4, stdin); } while (saisi[0] == 10 || saisi[0] == 1);
       if((saisi[0] == 'i' || saisi[0] == 'I') && (saisi[1] == 'a' || saisi[1] == 'A')) {
          getIAPlay(j, &x, &y);
       }  else {
 
-        if (saisi[0] >= 'A') saisi[0] -= 32;
-        x = saisi[0] - 'A';
+        if (saisi[0] >= 'A' && saisi[0] <= 'J') saisi[0] += 32;
+        x = saisi[0] - 'a';
         if (saisi[1] == '1' && saisi[2] == '0') y = 10;
         else y = saisi[1] - '1';
       }
